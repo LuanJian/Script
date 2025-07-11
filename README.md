@@ -12,7 +12,7 @@
     
 | 脚本名称 | 脚本功能 | 脚本链接 |
 | :----: | :----: | :----: |
-| **👑 Video-Parser 视频解析器** | 在视频网站播放页面左上角添加“解析视频”按钮，点击后可选择不同的接口进行解析 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js)** |
+| **视频解析器** | 在视频网站播放页左上角添加“解析视频”按钮，点击后可选择不同的接口进行解析 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js)** |
     
 > **提示提示**：安装后可在脚本控制台中的"已安装脚本"列表中找到并管理此脚本。
     
