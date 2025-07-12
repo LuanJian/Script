@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         👑 Video-Parser 视频解析器
 // @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js
-// @version      0.2
+// @version      0.3
 // @description  用于在主流视频网站上添加视频解析功能的油猴脚本，当您访问国内某个视频网站时，页面左上角会显示一个"解析视频"浮动按钮，点击后可选择不同的解析接口来观看视频。
 // @author       亦木
 // @match        *://v.qq.com/*
@@ -63,7 +63,24 @@ GM_addStyle(`
     display: none;
     flex-direction: column;
     gap: 10px;
-    min-width: 200px;
+    min-width: 100px;
+  }
+  .video-parser-platforms {
+    display: none;
+  }
+  .video-parser-type {
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+  }
+  .video-parser-type::after {
+    content: '▸';
+    position: absolute;
+    right: 0;
+    transition: transform 0.2s;
+  }
+  .video-parser-type.expanded::after {
+    content: '▾';
   }
   .video-parser-menu a {
     color: #333;
@@ -111,23 +128,194 @@ function createParserButton() {
     });
   
   const parsers = [
-    { name: '虾米解析', url: 'https://jx.xmflv.com/?url=' },
-    { name: '咸鱼解析', url: 'https://jx.xymp4.cc/?url=' },
-    { name: '极速解析', url: 'https://jx.2s0.cn/player/?url=' },
-    { name: 'M1907', url: 'https://im1907.top/?jx=' },
-    { name: 'PlayJY', url: 'https://jx.playerjy.com/?url=' }
+    {
+      name: '虾米解析',
+      url: 'https://jx.xmflv.com/?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': ['电影', '综艺', '电视剧'],
+        '优酷': ['电影', '电视剧'],
+        '乐视': ['电影'],
+        '爱奇艺': ['电影', '综艺', '电视剧']
+      }
+    },
+    {
+      name: 'PlayJY',
+      url: 'https://jx.playerjy.com/?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': ['电影', '综艺', '电视剧'],
+        '优酷': ['电影', '综艺', '电视剧'],
+        '乐视': [''],
+        '爱奇艺': ['电影', '综艺', '电视剧']
+      }
+    },
+    {
+      name: '七哥解析',
+      url: 'https://jx.nnxv.cn/tv.php?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': ['电影', '综艺', '电视剧'],
+        '优酷': ['电影', '综艺', '电视剧'],
+        '乐视': ['电影', '电视剧'],
+        '爱奇艺': ['电影', '综艺', '电视剧']
+      }
+    },
+    {
+      name: '七哥解析 2',
+      url: 'https://jx.mmkv.cn/tv.php?url=',
+      supported: {
+        '芒果': ['电影', '电视剧'],
+        '腾讯': ['电影', '电视剧'],
+        '优酷': ['电影', '电视剧'],
+        '乐视': [''],
+        '爱奇艺': ['电影']
+      }
+    },
+    {
+      name: '冰豆解析',
+      url: 'https://bd.jx.cn/?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': ['电影', '综艺', '电视剧'],
+        '优酷': ['电影', '电视剧'],
+        '乐视': [''],
+        '爱奇艺': ['电影', '综艺', '电视剧']
+      }
+    },
+    {
+      name: '咸鱼解析',
+      url: 'https://jx.xymp4.cc/?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': ['电视剧'],
+        '优酷': ['电视剧'],
+        '乐视': [''],
+        '爱奇艺': ['综艺', '电视剧']
+      }
+    },
+    {
+      name: '8090g',
+      url: 'https://www.8090g.cn/?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': [''],
+        '优酷': ['电影', '电视剧'],
+        '乐视': ['电影', '电视剧'],
+        '爱奇艺': ['电影', '电视剧']
+      }
+    },
+    {
+      name: '极速解析',
+      url: 'https://jx.2s0.cn/player/?url=',
+      supported: {
+        '芒果': ['电视剧'],
+        '腾讯': ['电视剧'],
+        '优酷': [''],
+        '乐视': [''],
+        '爱奇艺': ['综艺']
+      }
+    }
+  ];
+
+  const platforms = [
+    { name: '芒果', domain: 'mgtv.com' },
+    { name: '腾讯', domain: 'v.qq.com' },
+    { name: '优酷', domain: 'youku.com' },
+    { name: '乐视', domain: 'le.com' },
+    { name: '爱奇艺', domain: 'iqiyi.com' }
   ];
   
-  parsers.forEach(parser => {
-    const a = document.createElement('a');
-    a.textContent = parser.name;
-    a.href = '#';
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targetUrl = parser.url + encodeURIComponent(window.location.href);
-      window.open(targetUrl, '_blank');
+  const categories = {
+    '电影': platforms,
+    '综艺': platforms,
+    '电视剧': platforms
+  };
+  
+  Object.keys(categories).forEach(contentType => {
+    const typeItem = document.createElement('div');
+    typeItem.className = 'video-parser-type';
+    typeItem.textContent = contentType;
+    typeItem.style.fontWeight = 'bold';
+    typeItem.style.padding = '5px 0';
+    typeItem.style.borderBottom = '1px solid #eee';
+    typeItem.addEventListener('click', () => {
+      document.querySelectorAll('.video-parser-type').forEach(item => {
+        if (item !== typeItem && item.classList.contains('expanded')) {
+          const otherPlatforms = item.nextElementSibling;
+          if (otherPlatforms && otherPlatforms.classList.contains('video-parser-platforms')) {
+            otherPlatforms.style.display = 'none';
+            item.classList.remove('expanded');
+          }
+        }
+      });
+      
+      const isExpanded = platformsContainer.style.display === 'flex';
+      platformsContainer.style.display = isExpanded ? 'none' : 'flex';
+      typeItem.classList.toggle('expanded', !isExpanded);
     });
-    menu.appendChild(a);
+    menu.appendChild(typeItem);
+
+    const platformsContainer = document.createElement('div');
+    platformsContainer.className = 'video-parser-platforms';
+    platformsContainer.style.paddingLeft = '15px';
+    platformsContainer.style.flexDirection = 'column';
+    platformsContainer.style.gap = '5px';
+    menu.appendChild(platformsContainer);
+
+    const getCurrentPlatformDomain = () => {
+      const host = window.location.hostname;
+      const platformDomains = [
+        { name: '芒果', domain: 'mgtv.com' },
+        { name: '腾讯', domain: 'v.qq.com' },
+        { name: '优酷', domain: 'youku.com' },
+        { name: '乐视', domain: 'le.com' },
+        { name: '爱奇艺', domain: 'iqiyi.com' }
+      ];
+      
+      for (const platform of platformDomains) {
+        if (host.includes(platform.domain)) {
+          return platform.domain;
+        }
+      }
+      return null;
+    };
+
+    const currentDomain = getCurrentPlatformDomain();
+
+    categories[contentType].forEach(platform => {
+      
+      if (currentDomain && platform.domain !== currentDomain) {
+        return;
+      }
+      
+      const parsersContainer = document.createElement('div');
+      parsersContainer.className = 'video-parser-parsers';
+      parsersContainer.style.paddingLeft = '0';
+      parsersContainer.style.display = 'flex';
+      parsersContainer.style.flexDirection = 'column';
+      parsersContainer.style.justifyContent = 'center';
+      parsersContainer.style.alignItems = 'center';
+      parsersContainer.style.gap = '3px';
+      platformsContainer.appendChild(parsersContainer);
+
+      const supportedParsers = parsers.filter(parser => 
+        parser.supported[platform.name] && parser.supported[platform.name].includes(contentType)
+      );
+
+      supportedParsers.forEach(parser => {
+        const a = document.createElement('a');
+        a.textContent = `${parser.name}`;
+        a.href = '#';
+        a.style.fontSize = '13px';
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetUrl = parser.url + encodeURIComponent(window.location.href);
+          window.open(targetUrl, '_blank');
+        });
+        parsersContainer.appendChild(a);
+      });
+    });
   });
   
   document.body.appendChild(menu);
@@ -149,18 +337,13 @@ function initParserButton() {
   console.log('视频解析按钮已创建');
 }
 
-// 1. DOM加载完成时尝试创建
 window.addEventListener('DOMContentLoaded', initParserButton);
 
-// 2. 页面完全加载时再次尝试
 window.addEventListener('load', initParserButton);
 
-// 3. 延迟1秒再尝试一次，应对动态加载的页面
 setTimeout(initParserButton, 1000);
 
-// 4. 监听DOM变化，应对单页应用路由切换
 const observer = new MutationObserver(initParserButton);
 observer.observe(document.body, { childList: true, subtree: true });
 
-// 5. 提供手动创建按钮的方法，用于调试
 window.createVideoParserButton = initParserButton;
