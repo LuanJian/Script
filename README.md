@@ -12,7 +12,8 @@
 | :----: | :----: | :----: |
 | **视频解析器** | 在视频网站播放页左上角添加“解析视频”按钮，点击后可选择不同的接口进行解析 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js)** |    
 | **京东自营** | 将搜索按钮改为"搜索自营"，并在搜索时添加"京东自营"关键词实现只搜索自营产品 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/jd_search_self.users.js)** |    
-| **跳转目标网站** | 自动跳转到 URL 中 target 参数指定的网站，绕过二次确认页面 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/auto-jump.user.js)** |
+| **跳转目标网站** | 自动跳转到 URL 中 target 参数指定的网站，绕过二次确认页面 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/auto-jump.user.js)** |    
+| **转换为超链接** | 自动识别页面中的 URL 并将其转换为可点击的超链接 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/url-auto-link.user.js)** |
     
 > **提示提示**：安装后可在脚本控制台中的"已安装脚本"列表中找到并管理此脚本。
     
