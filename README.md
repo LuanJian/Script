@@ -10,8 +10,8 @@
     
 | 脚本名称 | 脚本功能 | 脚本链接 |
 | :----: | :----: | :----: |
-| **视频解析器** | 在视频网站播放页左上角添加“解析视频”按钮，点击后可选择不同的接口进行解析 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js)** |    
 | **京东自营** | 将搜索按钮改为"搜索自营"，并在搜索时添加"京东自营"关键词实现只搜索自营产品 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/jd_search_self.users.js)** |    
+| **视频解析器** | 在视频网站播放页左上角添加“解析视频”按钮，点击后可选择不同的接口进行解析 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js)** |    
 | **跳转目标网站** | 自动跳转到 URL 中 target 参数指定的网站，绕过二次确认页面 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/auto-jump.user.js)** |    
 | **转换为超链接** | 自动识别页面中的 URL 并将其转换为可点击的超链接 | **[复制链接](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/url-auto-link.user.js)** |
     
@@ -23,7 +23,7 @@
     
 本脚本仅供学习交流使用，严禁用于任何商业用途。不保证脚本稳定可用，会尽量抽时间进行维护，请耐心等待！
 
-## 其他插件库
+## 其他脚本库
 
 **ScriptCat** - [https://scriptcat.org/zh-CN/search](https://scriptcat.org/zh-CN/search)  
 **Greasy Fork** - [https://greasyfork.org/zh-CN/scripts](https://greasyfork.org/zh-CN/scripts)    
