@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         👑 Video-Parser 视频解析器
-// @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.users.js
+// @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.user.js
 // @version      0.3
 // @description  用于在主流视频网站上添加视频解析功能的油猴脚本，当您访问国内某个视频网站时，页面左上角会显示一个"解析视频"浮动按钮，点击后可选择不同的解析接口来观看视频。
 // @author       亦木
