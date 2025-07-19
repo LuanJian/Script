@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         京东搜索自营商品
-// @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/jd_search_self.users.js
+// @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/jd_search_self.user.js
 // @version      0.1
 // @description  将京东搜索按钮改为"搜索自营"，并在搜索时自动添加"京东自营"关键词实现只搜索自营产品。
 // @author       亦木
