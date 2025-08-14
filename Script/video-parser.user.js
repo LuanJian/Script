@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         👑 Video-Parser 视频解析器
 // @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.user.js
-// @version      0.3
+// @version      0.4
 // @description  用于在主流视频网站上添加视频解析功能的油猴脚本，当您访问国内某个视频网站时，页面左上角会显示一个"解析视频"浮动按钮，点击后可选择不同的解析接口来观看视频。
 // @author       亦木
 // @match        *://v.qq.com/*
@@ -9,6 +9,7 @@
 // @match        *://*.mgtv.com/*
 // @match        *://*.youku.com/*
 // @match        *://*.le.com/*
+// @match        *://*.bilibili.com/*
 // @grant        GM_addStyle
 // ==/UserScript==
 
@@ -17,19 +18,21 @@ GM_addStyle(`
     position: fixed;
     top: 20px;
     left: 20px;
-    background: #ff4400;
-    color: white;
+    background: linear-gradient(135deg, #ff4400, #ff6b35);
+    color: white !important;
     border: none;
     border-radius: 50px;
-    padding: 12px 20px;
+    padding: 12px 24px;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(255, 68, 0, 0.4);
     z-index: 999999;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+    user-select: none;
   }
   .video-parser-close {
     width: 20px;
@@ -48,49 +51,77 @@ GM_addStyle(`
     background: rgba(255,255,255,0.5);
   }
   .video-parser-btn:hover {
-    background: #e03c00;
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #e03c00, #ff4400);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(255, 68, 0, 0.6);
   }
   .video-parser-menu {
     position: fixed;
     top: 80px;
     left: 20px;
-    background: white;
+    background: #ffffff !important;
     border-radius: 8px;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-    z-index: 9998;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 999999;
     padding: 15px;
     display: none;
     flex-direction: column;
-    gap: 10px;
-    min-width: 100px;
-  }
-  .video-parser-platforms {
-    display: none;
+    min-width: 120px;
+    border: 1px solid #e0e0e0;
   }
   .video-parser-type {
     cursor: pointer;
     position: relative;
     text-align: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: bold;
+    color: #2c3e50 !important;
+    font-size: 14px;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .video-parser-type:hover {
+    background: #f8f9fa !important;
+  }
+  .video-parser-type:last-child {
+    border-bottom: none;
   }
   .video-parser-type::after {
     content: '▸';
     position: absolute;
-    right: 0;
+    right: 10px;
     transition: transform 0.2s;
+    color: #666;
   }
   .video-parser-type.expanded::after {
     content: '▾';
   }
-  .video-parser-menu a {
-    color: #333;
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: background 0.2s;
+  .video-parser-parsers {
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
-  .video-parser-menu a:hover {
-    background: #f0f0f0;
+  .video-parser-parsers a {
+    color: #0056b3 !important;
+    text-decoration: none !important;
+    padding: 10px 15px;
+    display: block;
+    text-align: center;
+    transition: all 0.2s;
+    border-radius: 4px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+    min-width: 80px;
+  }
+  .video-parser-parsers a:hover {
+    background: #e3f2fd !important;
+    color: #1976d2 !important;
+    transform: translateY(-1px);
   }
 `);
 
@@ -116,29 +147,12 @@ function createParserButton() {
   menu.className = 'video-parser-menu';
   
   closeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      console.log('关闭按钮被点击');
-      if (button && menu) {
-        button.style.display = 'none';
-        menu.style.display = 'none';
-        console.log('解析按钮和菜单已隐藏');
-      } else {
-        console.error('无法找到按钮或菜单元素');
-      }
-    });
+    e.stopPropagation();
+    button.style.display = 'none';
+    menu.style.display = 'none';
+  });
   
   const parsers = [
-    {
-      name: '虾米解析',
-      url: 'https://jx.xmflv.com/?url=',
-      supported: {
-        '芒果': ['电影', '综艺', '电视剧'],
-        '腾讯': ['电影', '综艺', '电视剧'],
-        '优酷': ['电影', '电视剧'],
-        '乐视': ['电影'],
-        '爱奇艺': ['电影', '综艺', '电视剧']
-      }
-    },
     {
       name: 'PlayJY',
       url: 'https://jx.playerjy.com/?url=',
@@ -147,7 +161,20 @@ function createParserButton() {
         '腾讯': ['电影', '综艺', '电视剧'],
         '优酷': ['电影', '综艺', '电视剧'],
         '乐视': [''],
-        '爱奇艺': ['电影', '综艺', '电视剧']
+        '爱奇艺': ['电影', '综艺', '电视剧'],
+        '哔哩哔哩': ['电影', '综艺', '电视剧']
+      }
+    },
+    {
+      name: '虾米解析',
+      url: 'https://jx.xmflv.com/?url=',
+      supported: {
+        '芒果': ['电影', '综艺', '电视剧'],
+        '腾讯': ['电影', '综艺', '电视剧'],
+        '优酷': ['电影', '电视剧'],
+        '乐视': ['电影'],
+        '爱奇艺': ['电影', '综艺', '电视剧'],
+        '哔哩哔哩': ['电影']
       }
     },
     {
@@ -158,7 +185,8 @@ function createParserButton() {
         '腾讯': ['电影', '综艺', '电视剧'],
         '优酷': ['电影', '综艺', '电视剧'],
         '乐视': ['电影', '电视剧'],
-        '爱奇艺': ['电影', '综艺', '电视剧']
+        '爱奇艺': ['电影', '综艺', '电视剧'],
+        '哔哩哔哩': ['电视剧']
       }
     },
     {
@@ -169,7 +197,8 @@ function createParserButton() {
         '腾讯': ['电影', '电视剧'],
         '优酷': ['电影', '电视剧'],
         '乐视': [''],
-        '爱奇艺': ['电影']
+        '爱奇艺': ['电影'],
+        '哔哩哔哩': ['电影', '综艺', '电视剧']
       }
     },
     {
@@ -180,7 +209,8 @@ function createParserButton() {
         '腾讯': ['电影', '综艺', '电视剧'],
         '优酷': ['电影', '电视剧'],
         '乐视': [''],
-        '爱奇艺': ['电影', '综艺', '电视剧']
+        '爱奇艺': ['电影', '综艺', '电视剧'],
+        '哔哩哔哩': ['']
       }
     },
     {
@@ -191,7 +221,8 @@ function createParserButton() {
         '腾讯': ['电视剧'],
         '优酷': ['电视剧'],
         '乐视': [''],
-        '爱奇艺': ['综艺', '电视剧']
+        '爱奇艺': ['综艺', '电视剧'],
+        '哔哩哔哩': ['']
       }
     },
     {
@@ -202,7 +233,8 @@ function createParserButton() {
         '腾讯': [''],
         '优酷': ['电影', '电视剧'],
         '乐视': ['电影', '电视剧'],
-        '爱奇艺': ['电影', '电视剧']
+        '爱奇艺': ['电影', '电视剧'],
+        '哔哩哔哩': ['电影']
       }
     },
     {
@@ -213,108 +245,74 @@ function createParserButton() {
         '腾讯': ['电视剧'],
         '优酷': [''],
         '乐视': [''],
-        '爱奇艺': ['综艺']
+        '爱奇艺': ['综艺'],
+        '哔哩哔哩': ['电影', '综艺', '电视剧']
       }
     }
   ];
 
-  const platforms = [
-    { name: '芒果', domain: 'mgtv.com' },
-    { name: '腾讯', domain: 'v.qq.com' },
-    { name: '优酷', domain: 'youku.com' },
-    { name: '乐视', domain: 'le.com' },
-    { name: '爱奇艺', domain: 'iqiyi.com' }
-  ];
+  const platforms = ['芒果', '腾讯', '优酷', '乐视', '爱奇艺', '哔哩哔哩'];
+  const categories = ['电影', '综艺', '电视剧'];
   
-  const categories = {
-    '电影': platforms,
-    '综艺': platforms,
-    '电视剧': platforms
-  };
-  
-  Object.keys(categories).forEach(contentType => {
-    const typeItem = document.createElement('div');
-    typeItem.className = 'video-parser-type';
-    typeItem.textContent = contentType;
-    typeItem.style.fontWeight = 'bold';
-    typeItem.style.padding = '5px 0';
-    typeItem.style.borderBottom = '1px solid #eee';
-    typeItem.addEventListener('click', () => {
-      document.querySelectorAll('.video-parser-type').forEach(item => {
-        if (item !== typeItem && item.classList.contains('expanded')) {
-          const otherPlatforms = item.nextElementSibling;
-          if (otherPlatforms && otherPlatforms.classList.contains('video-parser-platforms')) {
-            otherPlatforms.style.display = 'none';
-            item.classList.remove('expanded');
-          }
+  // 创建菜单项
+  categories.forEach(type => {
+    const item = document.createElement('div');
+    item.className = 'video-parser-type';
+    item.textContent = type;
+    menu.appendChild(item);
+
+    const container = document.createElement('div');
+    container.className = 'video-parser-parsers';
+    container.style.display = 'none';
+    menu.appendChild(container);
+
+    const host = window.location.hostname;
+    const platform = ['mgtv.com', 'v.qq.com', 'youku.com', 'le.com', 'iqiyi.com', 'bilibili.com']
+      .find(d => host.includes(d));
+    const current = platform ? 
+      ['芒果', '腾讯', '优酷', '乐视', '爱奇艺', '哔哩哔哩'][['mgtv.com', 'v.qq.com', 'youku.com', 'le.com', 'iqiyi.com', 'bilibili.com'].indexOf(platform)] : null;
+
+    let hasParsers = false;
+    const parserMap = new Map();
+    
+    (current ? [current] : platforms).forEach(p => {
+      parsers.forEach(parser => {
+        const types = parser.supported[p];
+        if (types && types.includes(type) && types[0] !== '') {
+          hasParsers = true;
+          parserMap.set(parser.name, parser);
         }
       });
-      
-      const isExpanded = platformsContainer.style.display === 'flex';
-      platformsContainer.style.display = isExpanded ? 'none' : 'flex';
-      typeItem.classList.toggle('expanded', !isExpanded);
     });
-    menu.appendChild(typeItem);
 
-    const platformsContainer = document.createElement('div');
-    platformsContainer.className = 'video-parser-platforms';
-    platformsContainer.style.paddingLeft = '15px';
-    platformsContainer.style.flexDirection = 'column';
-    platformsContainer.style.gap = '5px';
-    menu.appendChild(platformsContainer);
-
-    const getCurrentPlatformDomain = () => {
-      const host = window.location.hostname;
-      const platformDomains = [
-        { name: '芒果', domain: 'mgtv.com' },
-        { name: '腾讯', domain: 'v.qq.com' },
-        { name: '优酷', domain: 'youku.com' },
-        { name: '乐视', domain: 'le.com' },
-        { name: '爱奇艺', domain: 'iqiyi.com' }
-      ];
-      
-      for (const platform of platformDomains) {
-        if (host.includes(platform.domain)) {
-          return platform.domain;
-        }
-      }
-      return null;
-    };
-
-    const currentDomain = getCurrentPlatformDomain();
-
-    categories[contentType].forEach(platform => {
-      
-      if (currentDomain && platform.domain !== currentDomain) {
-        return;
-      }
-      
-      const parsersContainer = document.createElement('div');
-      parsersContainer.className = 'video-parser-parsers';
-      parsersContainer.style.paddingLeft = '0';
-      parsersContainer.style.display = 'flex';
-      parsersContainer.style.flexDirection = 'column';
-      parsersContainer.style.justifyContent = 'center';
-      parsersContainer.style.alignItems = 'center';
-      parsersContainer.style.gap = '3px';
-      platformsContainer.appendChild(parsersContainer);
-
-      const supportedParsers = parsers.filter(parser => 
-        parser.supported[platform.name] && parser.supported[platform.name].includes(contentType)
-      );
-
-      supportedParsers.forEach(parser => {
-        const a = document.createElement('a');
-        a.textContent = `${parser.name}`;
-        a.href = '#';
-        a.style.fontSize = '13px';
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetUrl = parser.url + encodeURIComponent(window.location.href);
-          window.open(targetUrl, '_blank');
-        });
-        parsersContainer.appendChild(a);
+    parserMap.forEach(parser => {
+      const link = document.createElement('a');
+      link.textContent = parser.name;
+      link.href = '#';
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        window.open(parser.url + encodeURIComponent(location.href), '_blank');
       });
+      container.appendChild(link);
+    });
+
+    if (!hasParsers && current) {
+      const msg = document.createElement('div');
+      msg.textContent = '暂不支持此平台';
+      msg.style.cssText = 'font-size:12px;color:#999;text-align:center';
+      container.appendChild(msg);
+    }
+
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.video-parser-type').forEach(el => {
+        if (el !== item && el.classList.contains('expanded')) {
+          el.classList.remove('expanded');
+          el.nextElementSibling.style.display = 'none';
+        }
+      });
+      const expanded = container.style.display === 'flex';
+      container.style.display = expanded ? 'none' : 'flex';
+      item.classList.toggle('expanded', !expanded);
     });
   });
   
@@ -324,26 +322,16 @@ function createParserButton() {
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
   });
   
-  document.addEventListener('click', (e) => {
-    if (!button.contains(e.target) && !menu.contains(e.target)) {
-      menu.style.display = 'none';
-    }
+  document.addEventListener('click', e => {
+    if (!button.contains(e.target) && !menu.contains(e.target)) menu.style.display = 'none';
   });
 }
 
-function initParserButton() {
+const initParserButton = () => {
   if (document.querySelector('.video-parser-btn')) return;
   createParserButton();
-  console.log('视频解析按钮已创建');
-}
+};
 
-window.addEventListener('DOMContentLoaded', initParserButton);
-
-window.addEventListener('load', initParserButton);
-
+['DOMContentLoaded', 'load'].forEach(e => window.addEventListener(e, initParserButton));
 setTimeout(initParserButton, 1000);
-
-const observer = new MutationObserver(initParserButton);
-observer.observe(document.body, { childList: true, subtree: true });
-
-window.createVideoParserButton = initParserButton;
+new MutationObserver(initParserButton).observe(document.body, {childList: true, subtree: true});
