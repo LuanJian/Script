@@ -11,6 +11,7 @@
 | 脚本名称 | 脚本功能 | 脚本链接 |
 | :----: | :----: | :----: |  
 | **视频解析器** | 在视频网站左上角添加“解析视频”按钮，可解析观看会员视频 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/video-parser.user.js)** |    
+| **自动播放下一集** | 观影 GYING 网站视频播放结束后自动播放下一集 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/gying-auto-next.user.js)** |   
 | **跳转目标网站** | 自动跳转到 URL 中 target 参数指定的网站，绕过二次确认页面 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/auto-jump.user.js)** |    
 | **转换为超链接** | 自动识别页面中的 URL 并将其转换为可点击的超链接 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/url-auto-link.user.js)** |
 | **NoCode.cn 签到** | 每日默认打开 1 次网站完成签到，能够领取 10 次对话次数 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/nocode-daily-open.user.js)** |
