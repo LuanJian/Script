@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         VS Code 软件离线插件下载
+// @name         VS Code 离线插件下载
 // @namespace    https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/download-vsix.user.js
 // @version      1.1
-// @description  在 VS Marketplace 插件页添加下载按钮，直接解析下载 .vsix 文件或跳转到 Open-VSX 插件页面下载。
+// @description  在 VS Marketplace 插件页添加下载按钮，直接解析下载 .vsix 文件或跳转到 Open-VSX 插件页面下载
 // @author       亦木
 // @match        https://marketplace.visualstudio.com/items?*
 // @grant        none
