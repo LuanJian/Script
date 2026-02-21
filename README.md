@@ -15,6 +15,7 @@
 | **跳转目标网站** | 自动跳转到 URL 中 target 参数指定的网站，绕过二次确认页面 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/auto-jump.user.js)** |    
 | **转换为超链接** | 自动识别页面中的 URL 并将其转换为可点击的超链接 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/url-auto-link.user.js)** |
 | **NoCode.cn 签到** | 每日默认打开 1 次网站完成签到，能够领取 10 次对话次数 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/nocode-daily-open.user.js)** |
+| **VS Code 离线插件下载** | 在 VS Marketplace 插件页添加下载按钮 | **[安装](https://raw.githubusercontent.com/LuanJian/Script/refs/heads/main/Script/download-vsix.user.js)** |
     
 > **提示提示**：安装后可在脚本控制台中的"已安装脚本"列表中找到并管理此脚本。
     
